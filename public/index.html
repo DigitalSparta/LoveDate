@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Свидание 14 Февраля</title>
+    <style>
+        /* Основной стиль */
+        body { margin: 0; font-family: 'Segoe UI', Tahoma, sans-serif; background: #2c3e50; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        
+        /* ЭКРАН ВХОДА */
+        #login-screen { position: absolute; top:0; left:0; width: 100%; height: 100%; background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100; }
+        #login-screen h1 { color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); text-align: center; }
+        #login-screen input { padding: 15px; border-radius: 30px; border: none; width: 250px; text-align: center; font-size: 18px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        #login-screen button { padding: 15px 40px; border-radius: 30px; border: none; background: #ff6b6b; color: white; font-size: 18px; cursor: pointer; transition: transform 0.2s; box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4); }
+        #login-screen button:active { transform: scale(0.95); }
+
+        /* ИГРОВОЙ ЭКРАН */
+        #game-screen { display: none; flex-direction: column; height: 100%; }
+
+        /* ВЕРХНЯЯ ПАНЕЛЬ (Деньги и Счастье) */
+        #stats-bar { height: 50px; background: #fff; display: flex; justify-content: space-around; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 2; }
+        .stat { font-weight: bold; font-size: 18px; display: flex; align-items: center; gap: 5px; }
+        
+        /* РЕСТОРАН (Сцена) */
+        #restaurant-view { flex: 2; position: relative; background: url('bg.jpg') no-repeat center center; background-size: cover; overflow: hidden; }
+        
+        /* Аватарки */
+        .avatar { width: 120px; height: 120px; position: absolute; bottom: 20px; border-radius: 50%; border: 4px solid white; box-shadow: 0 4px 20px rgba(0,0,0,0.5); object-fit: cover; transition: transform 0.3s; }
+        #my-avatar { left: 10%; transform: rotate(5deg); } /* Я слева */
+        #partner-avatar { right: 10%; transform: rotate(-5deg); } /* Она справа */
+        
+        /* Всплывающие эмодзи */
+        .floating-emoji { position: absolute; font-size: 40px; animation: floatUp 2s ease-out forwards; pointer-events: none; }
+        @keyframes floatUp { 0% { transform: translateY(0) scale(0.5); opacity: 1; } 100% { transform: translateY(-150px) scale(1.2); opacity: 0; } }
+
+        /* ЧАТ и УПРАВЛЕНИЕ */
+        #controls-area { flex: 1.5; background: #fff; display: flex; flex-direction: column; border-top: 2px solid #eee; }
+        
+        /* Зона чата */
+        #chat-container { flex-grow: 1; overflow-y: auto; padding: 15px; background: #f9f9f9; }
+        .msg { padding: 8px 12px; margin-bottom: 8px; border-radius: 15px; max-width: 80%; font-size: 14px; line-height: 1.4; }
+        .msg-mine { background: #ffcccc; margin-left: auto; border-bottom-right-radius: 2px; }
+        .msg-theirs { background: #fff; border: 1px solid #ddd; margin-right: auto; border-bottom-left-radius: 2px; }
+        .msg-system { text-align: center; color: #888; font-size: 12px; width: 100%; background: none; border: none; }
+
+        /* Кнопки действий */
+        #actions-bar { padding: 10px; display: flex; gap: 10px; overflow-x: auto; background: #fff; border-top: 1px solid #eee; }
+        .action-btn { flex: 1; padding: 12px; border: none; border-radius: 10px; background: #f0f0f0; color: #333; font-weight: bold; cursor: pointer; white-space: nowrap; }
+        .btn-work { background: #4CAF50; color: white; } /* Заработать */
+        .btn-menu { background: #FF9800; color: white; } /* Меню */
+
+        /* Ввод сообщения */
+        #chat-form { display: flex; padding: 10px; background: #fff; border-top: 1px solid #eee; }
+        #chat-input { flex-grow: 1; padding: 12px; border: 1px solid #ddd; border-radius: 20px; outline: none; }
+        #chat-send { margin-left: 10px; padding: 0 20px; background: #ff4d4d; color: white; border: none; border-radius: 20px; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <div id="login-screen">
+        <h1>❤️ Love Date ❤️</h1>
+        <input id="username-input" placeholder="Как тебя зовут?" autocomplete="off" />
+        <button onclick="joinGame()">Начать свидание</button>
+    </div>
+
+    <div id="game-screen">
+        <div id="stats-bar">
+            <div class="stat">💰 <span id="money-display">0</span>$</div>
+            <div class="stat">🥰 <span id="happiness-display">0</span>%</div>
+        </div>
+
+        <div id="restaurant-view">
+            <img id="my-avatar" src="me.png" onerror="this.src='https://placekitten.com/200/200'" class="avatar">
+            <img id="partner-avatar" src="her.png" onerror="this.src='https://placekitten.com/201/201'" class="avatar">
+        </div>
+
+        <div id="controls-area">
+            <div id="chat-container"></div>
+            
+            <div id="actions-bar">
+                <button class="action-btn btn-menu" onclick="sendAction('🍷 Заказал вино')">🍷 Вино</button>
+                <button class="action-btn btn-menu" onclick="sendAction('🥩 Заказал стейк')">🥩 Стейк</button>
+                <button class="action-btn btn-work" onclick="doWork()">💸 Работать (+10$)</button>
+                <button class="action-btn" onclick="sendAction('😘 Поцеловал')">😘 Чмок</button>
+            </div>
+
+            <form id="chat-form">
+                <input id="chat-input" autocomplete="off" placeholder="Напиши ей что-нибудь..." />
+                <button id="chat-send">Send</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        var socket = io();
+        var myName = "";
+        var money = 0;
+        var happiness = 50;
+
+        // Вход в игру
+        function joinGame() {
+            var input = document.getElementById('username-input');
+            if (input.value) {
+                myName = input.value;
+                socket.emit('join_game', myName);
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('game-screen').style.display = 'flex';
+                
+                // Проверка: Кто я? Если я Абылай - моя аватарка слева
+                // Если имя другое - считаем что это партнер (для простоты пока так)
+            }
+        }
+
+        // ОТПРАВКА ДЕЙСТВИЙ (Кнопки)
+        function sendAction(text) {
+            // Отправляем как сообщение, но с пометкой
+            socket.emit('chat_message', "✨ " + text);
+            
+            // Анимация эмодзи
+            showFloatingEmoji("💖");
+        }
+
+        // ЗАРАБОТОК ДЕНЕГ
+        function doWork() {
+            money += 10;
+            document.getElementById('money-display').textContent = money;
+            showFloatingEmoji("💵");
+            // Тут можно отправить на сервер инфо, что ты заработал
+        }
+
+        // Анимация всплывающих эмодзи
+        function showFloatingEmoji(emoji) {
+            const el = document.createElement('div');
+            el.textContent = emoji;
+            el.className = 'floating-emoji';
+            el.style.left = Math.random() * 80 + 10 + "%";
+            el.style.bottom = "150px";
+            document.getElementById('restaurant-view').appendChild(el);
+            setTimeout(() => el.remove(), 2000);
+        }
+
+        // ЧАТ: Отправка
+        document.getElementById('chat-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            var input = document.getElementById('chat-input');
+            if (input.value) {
+                socket.emit('chat_message', input.value);
+                input.value = '';
+            }
+        });
+
+        // ЧАТ: Прием сообщений
+        socket.on('chat_message', function(data) {
+            var container = document.getElementById('chat-container');
+            var item = document.createElement('div');
+            
+            item.textContent = data.user + ": " + data.text;
+            item.classList.add('msg');
+            
+            if (data.user === myName) item.classList.add('msg-mine');
+            else item.classList.add('msg-theirs');
+            
+            container.appendChild(item);
+            container.scrollTop = container.scrollHeight;
+        });
+
+        socket.on('system_message', function(msg) {
+            var container = document.getElementById('chat-container');
+            var item = document.createElement('div');
+            item.textContent = msg;
+            item.classList.add('msg', 'msg-system');
+            container.appendChild(item);
+        });
+    </script>
+</body>
+</html>
