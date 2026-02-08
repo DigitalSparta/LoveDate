@@ -3,90 +3,144 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Свидание 14 Февраля</title>
+    <title>Наше Свидание ❤️</title>
     <style>
-        /* Основной стиль */
-        body { margin: 0; font-family: 'Segoe UI', Tahoma, sans-serif; background: #2c3e50; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #2c3e50; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
         
-        /* ЭКРАН ВХОДА */
-        #login-screen { position: absolute; top:0; left:0; width: 100%; height: 100%; background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100; }
-        #login-screen h1 { color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); text-align: center; }
-        #login-screen input { padding: 15px; border-radius: 30px; border: none; width: 250px; text-align: center; font-size: 18px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        #login-screen button { padding: 15px 40px; border-radius: 30px; border: none; background: #ff6b6b; color: white; font-size: 18px; cursor: pointer; transition: transform 0.2s; box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4); }
-        #login-screen button:active { transform: scale(0.95); }
+        /* --- ЭКРАНЫ --- */
+        .screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s; background-size: cover; background-position: center; }
+        .hidden { display: none !important; }
 
-        /* ИГРОВОЙ ЭКРАН */
-        #game-screen { display: none; flex-direction: column; height: 100%; }
+        /* 1. ВХОД */
+        #login-screen { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); z-index: 30; }
+        #login-screen h1 { color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); font-size: 2.5rem; margin-bottom: 30px; }
+        #login-screen input { padding: 15px; border-radius: 30px; border: none; width: 80%; max-width: 300px; text-align: center; font-size: 18px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .btn-primary { padding: 15px 40px; border-radius: 30px; background: #ff6b6b; color: white; border: none; font-size: 18px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4); transition: transform 0.2s; }
+        .btn-primary:active { transform: scale(0.95); }
 
-        /* ВЕРХНЯЯ ПАНЕЛЬ (Деньги и Счастье) */
-        #stats-bar { height: 50px; background: #fff; display: flex; justify-content: space-around; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 2; }
-        .stat { font-weight: bold; font-size: 18px; display: flex; align-items: center; gap: 5px; }
+        /* 2. КАСТОМИЗАЦИЯ */
+        #custom-screen { background: #fff0f5; z-index: 20; padding: 20px; box-sizing: border-box; }
+        #char-preview-container { 
+            position: relative; width: 260px; height: 350px; 
+            background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
+            margin-bottom: 20px; overflow: hidden; border: 2px solid #ffcccc;
+        }
         
-        /* РЕСТОРАН (Сцена) */
-        #restaurant-view { flex: 2; position: relative; background: url('bg.jpg') no-repeat center center; background-size: cover; overflow: hidden; }
-        
-        /* Аватарки */
-        .avatar { width: 120px; height: 120px; position: absolute; bottom: 20px; border-radius: 50%; border: 4px solid white; box-shadow: 0 4px 20px rgba(0,0,0,0.5); object-fit: cover; transition: transform 0.3s; }
-        #my-avatar { left: 10%; transform: rotate(5deg); } /* Я слева */
-        #partner-avatar { right: 10%; transform: rotate(-5deg); } /* Она справа */
-        
-        /* Всплывающие эмодзи */
-        .floating-emoji { position: absolute; font-size: 40px; animation: floatUp 2s ease-out forwards; pointer-events: none; }
-        @keyframes floatUp { 0% { transform: translateY(0) scale(0.5); opacity: 1; } 100% { transform: translateY(-150px) scale(1.2); opacity: 0; } }
+        /* Слои персонажа */
+        .char-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; }
 
-        /* ЧАТ и УПРАВЛЕНИЕ */
-        #controls-area { flex: 1.5; background: #fff; display: flex; flex-direction: column; border-top: 2px solid #eee; }
+        .controls-row { display: flex; align-items: center; justify-content: space-between; width: 100%; max-width: 300px; margin-bottom: 10px; background: white; padding: 5px; border-radius: 15px; }
+        .arrow-btn { background: #eee; border: none; width: 40px; height: 40px; border-radius: 50%; font-size: 20px; cursor: pointer; color: #555; }
+        .label-text { font-weight: bold; color: #555; }
+
+        /* 3. ИГРА (РЕСТОРАН) */
+        #game-screen { background: #333; z-index: 10; justify-content: flex-start; }
         
-        /* Зона чата */
-        #chat-container { flex-grow: 1; overflow-y: auto; padding: 15px; background: #f9f9f9; }
-        .msg { padding: 8px 12px; margin-bottom: 8px; border-radius: 15px; max-width: 80%; font-size: 14px; line-height: 1.4; }
+        /* Верхняя панель (Счет) */
+        #stats-bar { width: 100%; height: 60px; background: rgba(255,255,255,0.9); display: flex; justify-content: space-around; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 5; }
+        .stat-item { font-size: 18px; font-weight: bold; }
+
+        /* Сцена ресторана */
+        #restaurant-view { flex: 2; width: 100%; position: relative; background: #eee; overflow: hidden; }
+        /* Фон ресторана - если картинки нет, будет розовый градиент */
+        #bg-image { width: 100%; height: 100%; object-fit: cover; position: absolute; }
+        .bg-fallback { background: linear-gradient(to top, #cfd9df 0%, #e2ebf0 100%); width: 100%; height: 100%; position: absolute; }
+
+        /* Игроки на сцене */
+        .player-container { position: absolute; bottom: 40px; width: 140px; height: 200px; transition: all 0.5s; }
+        .player-left { left: 15%; } 
+        .player-right { right: 15%; transform: scaleX(-1); } /* Разворачиваем второго игрока зеркально */
+        .player-name { position: absolute; top: -30px; width: 100%; text-align: center; background: rgba(255,255,255,0.8); padding: 4px 0; border-radius: 10px; font-size: 14px; font-weight: bold; transform: scaleX(1) !important; /* Имя не зеркалить */ }
+        /* Если игрок справа, имя нужно "раззеркалить" обратно */
+        .player-right .player-name { transform: scaleX(-1); }
+
+        /* Чат и кнопки */
+        #ui-layer { flex: 1.5; background: white; display: flex; flex-direction: column; width: 100%; border-top-left-radius: 20px; border-top-right-radius: 20px; overflow: hidden; }
+        #actions-scroll { display: flex; overflow-x: auto; padding: 10px; gap: 10px; background: #f9f9f9; border-bottom: 1px solid #eee; }
+        .action-btn { padding: 10px 15px; border: none; border-radius: 15px; background: #fff; border: 1px solid #ddd; white-space: nowrap; cursor: pointer; font-size: 14px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .btn-love { background: #ffe6e6; border-color: #ffcccc; color: #d63031; }
+        .btn-food { background: #fff3cd; border-color: #ffeeba; color: #856404; }
+        .btn-work { background: #d4edda; border-color: #c3e6cb; color: #155724; }
+
+        #messages { flex-grow: 1; overflow-y: auto; padding: 15px; list-style: none; margin: 0; background: #fff; }
+        .msg { padding: 8px 12px; margin-bottom: 8px; border-radius: 12px; max-width: 80%; font-size: 14px; line-height: 1.4; word-wrap: break-word; }
         .msg-mine { background: #ffcccc; margin-left: auto; border-bottom-right-radius: 2px; }
-        .msg-theirs { background: #fff; border: 1px solid #ddd; margin-right: auto; border-bottom-left-radius: 2px; }
-        .msg-system { text-align: center; color: #888; font-size: 12px; width: 100%; background: none; border: none; }
+        .msg-theirs { background: #f1f0f0; margin-right: auto; border-bottom-left-radius: 2px; }
+        .msg-system { text-align: center; color: #888; font-size: 12px; width: 100%; max-width: 100%; background: transparent; }
 
-        /* Кнопки действий */
-        #actions-bar { padding: 10px; display: flex; gap: 10px; overflow-x: auto; background: #fff; border-top: 1px solid #eee; }
-        .action-btn { flex: 1; padding: 12px; border: none; border-radius: 10px; background: #f0f0f0; color: #333; font-weight: bold; cursor: pointer; white-space: nowrap; }
-        .btn-work { background: #4CAF50; color: white; } /* Заработать */
-        .btn-menu { background: #FF9800; color: white; } /* Меню */
+        #chat-form { display: flex; padding: 10px; border-top: 1px solid #eee; background: #fff; }
+        #chat-input { flex-grow: 1; border: 1px solid #ddd; border-radius: 20px; padding: 10px 15px; outline: none; }
+        #chat-send { margin-left: 10px; padding: 0 20px; background: #ff6b6b; color: white; border: none; border-radius: 20px; cursor: pointer; }
 
-        /* Ввод сообщения */
-        #chat-form { display: flex; padding: 10px; background: #fff; border-top: 1px solid #eee; }
-        #chat-input { flex-grow: 1; padding: 12px; border: 1px solid #ddd; border-radius: 20px; outline: none; }
-        #chat-send { margin-left: 10px; padding: 0 20px; background: #ff4d4d; color: white; border: none; border-radius: 20px; font-weight: bold; cursor: pointer; }
+        /* Анимация эмодзи */
+        .floating-emoji { position: absolute; font-size: 40px; animation: floatUp 2s ease-out forwards; pointer-events: none; z-index: 100; }
+        @keyframes floatUp { 0% { transform: translateY(0) scale(0.5); opacity: 1; } 100% { transform: translateY(-100px) scale(1.5); opacity: 0; } }
+
     </style>
 </head>
 <body>
 
-    <div id="login-screen">
+    <div id="login-screen" class="screen">
         <h1>❤️ Love Date ❤️</h1>
-        <input id="username-input" placeholder="Как тебя зовут?" autocomplete="off" />
-        <button onclick="joinGame()">Начать свидание</button>
+        <input id="username" placeholder="Твое имя..." autocomplete="off" />
+        <button class="btn-primary" onclick="goToCustomization()">Начать игру</button>
     </div>
 
-    <div id="game-screen">
+    <div id="custom-screen" class="screen hidden">
+        <h2 style="color: #444; margin-bottom: 10px;">Как ты выглядишь?</h2>
+        
+        <div id="char-preview-container">
+            <img id="layer-body" class="char-layer" src="" onerror="this.style.display='none'">
+            <img id="layer-clothes" class="char-layer" src="" onerror="this.style.display='none'">
+            <img id="layer-head" class="char-layer" src="" onerror="this.style.display='none'">
+        </div>
+
+        <div class="controls-row">
+            <button class="arrow-btn" onclick="changeAsset('body', -1)">◀</button>
+            <span class="label-text">Тело / Пол</span>
+            <button class="arrow-btn" onclick="changeAsset('body', 1)">▶</button>
+        </div>
+        <div class="controls-row">
+            <button class="arrow-btn" onclick="changeAsset('clothes', -1)">◀</button>
+            <span class="label-text">Одежда</span>
+            <button class="arrow-btn" onclick="changeAsset('clothes', 1)">▶</button>
+        </div>
+        <div class="controls-row">
+            <button class="arrow-btn" onclick="changeAsset('head', -1)">◀</button>
+            <span class="label-text">Прическа</span>
+            <button class="arrow-btn" onclick="changeAsset('head', 1)">▶</button>
+        </div>
+
+        <button class="btn-primary" style="margin-top: 20px;" onclick="startGame()">Пойти в ресторан 🌹</button>
+    </div>
+
+    <div id="game-screen" class="screen hidden">
+        
         <div id="stats-bar">
-            <div class="stat">💰 <span id="money-display">0</span>$</div>
-            <div class="stat">🥰 <span id="happiness-display">0</span>%</div>
+            <div class="stat-item">💰 <span id="money-display">0</span>$</div>
+            <div class="stat-item">❤️ <span id="happiness-display">50</span>%</div>
         </div>
 
         <div id="restaurant-view">
-            <img id="my-avatar" src="me.png" onerror="this.src='https://placekitten.com/200/200'" class="avatar">
-            <img id="partner-avatar" src="her.png" onerror="this.src='https://placekitten.com/201/201'" class="avatar">
-        </div>
-
-        <div id="controls-area">
-            <div id="chat-container"></div>
+            <div class="bg-fallback"></div>
+            <img id="bg-image" src="assets/bg.jpg" onerror="this.style.display='none'"> 
             
-            <div id="actions-bar">
-                <button class="action-btn btn-menu" onclick="sendAction('🍷 Заказал вино')">🍷 Вино</button>
-                <button class="action-btn btn-menu" onclick="sendAction('🥩 Заказал стейк')">🥩 Стейк</button>
-                <button class="action-btn btn-work" onclick="doWork()">💸 Работать (+10$)</button>
-                <button class="action-btn" onclick="sendAction('😘 Поцеловал')">😘 Чмок</button>
             </div>
 
+        <div id="ui-layer">
+            <div id="actions-scroll">
+                <button class="action-btn btn-food" onclick="sendAction('🍷 Заказал вино')">🍷 Вино</button>
+                <button class="action-btn btn-food" onclick="sendAction('🥩 Заказал стейк')">🥩 Стейк</button>
+                <button class="action-btn btn-food" onclick="sendAction('🍰 Десертик')">🍰 Десерт</button>
+                <button class="action-btn btn-love" onclick="sendAction('😘 Поцеловал')">😘 Чмок</button>
+                <button class="action-btn btn-love" onclick="sendAction('💃 Пригласил танцевать')">💃 Танец</button>
+                <button class="action-btn btn-work" onclick="doWork()">💸 Работать (+15$)</button>
+            </div>
+
+            <ul id="messages"></ul>
+
             <form id="chat-form">
-                <input id="chat-input" autocomplete="off" placeholder="Напиши ей что-нибудь..." />
+                <input id="chat-input" autocomplete="off" placeholder="Напиши что-нибудь..." />
                 <button id="chat-send">Send</button>
             </form>
         </div>
@@ -94,85 +148,169 @@
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
-        var socket = io();
-        var myName = "";
-        var money = 0;
-        var happiness = 50;
+        const socket = io();
+        let myName = "";
+        let money = 0;
+        let happiness = 50;
+        
+        // --- НАСТРОЙКА ФАЙЛОВ (Имена должны совпадать с тем, что в папке assets) ---
+        const assetsConfig = {
+            // "assets/" добавляется автоматически в функции updatePreview
+            body: ['body_boy.png', 'body_girl.png'], 
+            clothes: ['outfit1.png', 'outfit2.png', 'outfit3.png'],
+            head: ['head1.png', 'head2.png', 'head3.png'] 
+        };
 
-        // Вход в игру
-        function joinGame() {
-            var input = document.getElementById('username-input');
-            if (input.value) {
-                myName = input.value;
-                socket.emit('join_game', myName);
-                document.getElementById('login-screen').style.display = 'none';
-                document.getElementById('game-screen').style.display = 'flex';
-                
-                // Проверка: Кто я? Если я Абылай - моя аватарка слева
-                // Если имя другое - считаем что это партнер (для простоты пока так)
-            }
-        }
+        let currentLook = { body: 0, clothes: 0, head: 0 };
 
-        // ОТПРАВКА ДЕЙСТВИЙ (Кнопки)
-        function sendAction(text) {
-            // Отправляем как сообщение, но с пометкой
-            socket.emit('chat_message', "✨ " + text);
+        // 1. ЛОГИН -> КАСТОМИЗАЦИЯ
+        function goToCustomization() {
+            const input = document.getElementById('username');
+            if(!input.value.trim()) return alert("Пожалуйста, введи имя!");
+            myName = input.value.trim();
             
-            // Анимация эмодзи
-            showFloatingEmoji("💖");
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('custom-screen').classList.remove('hidden');
+            updatePreview();
         }
 
-        // ЗАРАБОТОК ДЕНЕГ
+        // 2. ЛОГИКА КАСТОМИЗАЦИИ
+        function changeAsset(type, dir) {
+            const arr = assetsConfig[type];
+            currentLook[type] += dir;
+            if (currentLook[type] >= arr.length) currentLook[type] = 0;
+            if (currentLook[type] < 0) currentLook[type] = arr.length - 1;
+            updatePreview();
+        }
+
+        function updatePreview() {
+            const path = "assets/"; // Папка, где лежат картинки
+            
+            setImageSafe('layer-body', path + assetsConfig.body[currentLook.body]);
+            setImageSafe('layer-clothes', path + assetsConfig.clothes[currentLook.clothes]);
+            setImageSafe('layer-head', path + assetsConfig.head[currentLook.head]);
+        }
+
+        // Функция "безопасной" установки картинки (скрывает, если файла нет)
+        function setImageSafe(id, src) {
+            const img = document.getElementById(id);
+            img.style.display = 'block'; // Сброс скрытия
+            img.src = src;
+        }
+
+        // 3. СТАРТ ИГРЫ
+        function startGame() {
+            document.getElementById('custom-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+            
+            // Отправляем серверу наши данные
+            socket.emit('join_game', { name: myName, look: currentLook });
+        }
+
+        // --- ИГРОВАЯ ЛОГИКА ---
+
+        // Действия (кнопки)
+        function sendAction(text) {
+            socket.emit('chat_message', "✨ " + text);
+            spawnEmoji("💖");
+            happiness += 5;
+            updateStats();
+        }
+
+        // Работа
         function doWork() {
-            money += 10;
-            document.getElementById('money-display').textContent = money;
-            showFloatingEmoji("💵");
-            // Тут можно отправить на сервер инфо, что ты заработал
+            money += 15;
+            updateStats();
+            spawnEmoji("💵");
+            // Можно отправить сообщение, что поработал, но не обязательно спамить в чат
         }
 
-        // Анимация всплывающих эмодзи
-        function showFloatingEmoji(emoji) {
+        function updateStats() {
+            document.getElementById('money-display').textContent = money;
+            document.getElementById('happiness-display').textContent = happiness;
+        }
+
+        function spawnEmoji(char) {
             const el = document.createElement('div');
-            el.textContent = emoji;
+            el.textContent = char;
             el.className = 'floating-emoji';
-            el.style.left = Math.random() * 80 + 10 + "%";
+            // Случайная позиция
+            el.style.left = (Math.random() * 60 + 20) + "%";
             el.style.bottom = "150px";
             document.getElementById('restaurant-view').appendChild(el);
             setTimeout(() => el.remove(), 2000);
         }
 
-        // ЧАТ: Отправка
-        document.getElementById('chat-form').addEventListener('submit', function(e) {
+        // --- СОКЕТЫ (СЕТЬ) ---
+
+        // Кто-то присоединился (или я сам, когда сервер вернул список)
+        socket.on('player_joined', (player) => {
+            renderPlayer(player);
+        });
+
+        // Отрисовка игрока в ресторане
+        function renderPlayer(player) {
+            // Если игрок уже есть, не рисуем дубль
+            if(document.getElementById('p-' + player.name)) return;
+
+            const div = document.createElement('div');
+            div.id = 'p-' + player.name;
+            div.className = 'player-container';
+            
+            // Позиция: Если это я - слева. Если кто-то другой - справа.
+            if(player.name === myName) {
+                div.classList.add('player-left');
+            } else {
+                div.classList.add('player-right');
+            }
+
+            const path = "assets/";
+            
+            // Собираем HTML персонажа
+            div.innerHTML = `
+                <div class="player-name">${player.name}</div>
+                <img class="char-layer" src="${path + assetsConfig.body[player.look.body]}" onerror="this.style.display='none'">
+                <img class="char-layer" src="${path + assetsConfig.clothes[player.look.clothes]}" onerror="this.style.display='none'">
+                <img class="char-layer" src="${path + assetsConfig.head[player.look.head]}" onerror="this.style.display='none'">
+            `;
+            
+            document.getElementById('restaurant-view').appendChild(div);
+        }
+
+        // Чат
+        const chatForm = document.getElementById('chat-form');
+        chatForm.addEventListener('submit', (e) => {
             e.preventDefault();
-            var input = document.getElementById('chat-input');
-            if (input.value) {
-                socket.emit('chat_message', input.value);
+            const input = document.getElementById('chat-input');
+            if(input.value.trim()) {
+                socket.emit('chat_message', input.value.trim());
                 input.value = '';
             }
         });
 
-        // ЧАТ: Прием сообщений
-        socket.on('chat_message', function(data) {
-            var container = document.getElementById('chat-container');
-            var item = document.createElement('div');
+        socket.on('chat_message', (data) => {
+            const ul = document.getElementById('messages');
+            const li = document.createElement('li');
+            li.classList.add('msg');
             
-            item.textContent = data.user + ": " + data.text;
-            item.classList.add('msg');
+            if(data.user === 'System') {
+                li.classList.add('msg-system');
+                li.textContent = data.text;
+            } else {
+                li.textContent = data.text; // Сначала текст, чтобы понять длину
+                // Добавляем имя
+                const nameSpan = document.createElement('strong');
+                nameSpan.textContent = data.user + ": ";
+                li.prepend(nameSpan);
+
+                if(data.user === myName) li.classList.add('msg-mine');
+                else li.classList.add('msg-theirs');
+            }
             
-            if (data.user === myName) item.classList.add('msg-mine');
-            else item.classList.add('msg-theirs');
-            
-            container.appendChild(item);
-            container.scrollTop = container.scrollHeight;
+            ul.appendChild(li);
+            ul.scrollTop = ul.scrollHeight; // Прокрутка вниз
         });
 
-        socket.on('system_message', function(msg) {
-            var container = document.getElementById('chat-container');
-            var item = document.createElement('div');
-            item.textContent = msg;
-            item.classList.add('msg', 'msg-system');
-            container.appendChild(item);
-        });
     </script>
 </body>
 </html>
