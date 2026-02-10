@@ -4,41 +4,43 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Love Date ❤️</title>
-    <link rel="stylesheet" href="style.css"> </head>
+    <link rel="stylesheet" href="style.css">
+</head>
 <body>
+
+    <div id="preloader">
+        <div class="loader-heart">❤️</div>
+        <div class="loader-text">Накрываем на стол...</div>
+    </div>
 
     <div id="login-screen" class="screen">
         <h1>Love Date ❤️</h1>
-        
         <div class="char-preview-box">
             <img id="preview-img" src="">
         </div>
-        
         <div class="login-controls">
             <button class="btn" onclick="toggleGender()">Пол: М/Ж</button>
             <button class="btn" onclick="nextStyle()">Сменить образ 👕</button>
         </div>
-
         <input id="username-input" type="text" placeholder="Твое имя..." autocomplete="off">
         <button class="btn btn-big" onclick="startGame()">НАЧАТЬ СВИДАНИЕ 🌹</button>
     </div>
 
     <div id="game-screen" class="screen hidden">
-        
         <div id="game-world">
             <div id="waiter">
-                <img src="assets/waiter.png" onerror="this.style.display='none'">
+                <img src="assets/waiter.png">
                 <div class="bubble">Ваш заказ!</div>
             </div>
 
-            <div id="table-area"></div>
+            <div id="plate-left" class="plate-zone"></div>
+            <div id="plate-right" class="plate-zone"></div>
 
             </div>
 
         <div id="ui-layer">
-            
             <div id="top-bar">
-                <div class="stat">💰 <span id="money-display">50</span>$</div>
+                <div class="stat">💰 <span id="money-display">0</span>$</div>
                 <div class="menu-buttons">
                     <button class="btn-small work-btn" onclick="toggleWork()">💸 Работа</button>
                     <button class="btn-small" onclick="toggleMenu()">🍽 Меню</button>
@@ -63,26 +65,21 @@
     </div>
 
     <div id="food-menu" class="modal hidden">
-        <h2>Меню Ресторана</h2>
+        <h2>Меню</h2>
         <div class="menu-grid">
-            <div class="menu-item" onclick="orderFood('Стейк', 50, 'food_steak.png')">
-                <span class="icon">🥩</span> <b>Стейк (50$)</b>
-            </div>
-            <div class="menu-item" onclick="orderFood('Вино', 30, 'food_wine.png')">
-                <span class="icon">🍷</span> <b>Вино (30$)</b>
-            </div>
-            <div class="menu-item" onclick="orderFood('Десерт', 20, 'food_cake.png')">
-                <span class="icon">🍰</span> <b>Десерт (20$)</b>
-            </div>
+            <div class="menu-item" onclick="orderFood('Стейк', 50, 'food_steak.png')"><span class="icon">🥩</span> <b>Стейк (50$)</b></div>
+            <div class="menu-item" onclick="orderFood('Вино', 30, 'food_wine.png')"><span class="icon">🍷</span> <b>Вино (30$)</b></div>
+            <div class="menu-item" onclick="orderFood('Десерт', 20, 'food_cake.png')"><span class="icon">🍰</span> <b>Десерт (20$)</b></div>
         </div>
         <button class="btn" onclick="toggleMenu()">Закрыть</button>
     </div>
 
     <div id="work-overlay" class="overlay hidden">
         <h1 style="color:white; margin-top: 100px;">Лови сердечки! (+10$)</h1>
-        <button class="btn close-overlay-btn" onclick="toggleWork()">Закончить</button>
-        </div>
+        <button class="btn close-overlay-btn" onclick="toggleWork()">Хватит</button>
+    </div>
 
     <script src="/socket.io/socket.io.js"></script>
-    <script src="game.js"></script> </body>
+    <script src="game.js"></script>
+</body>
 </html>
