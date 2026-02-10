@@ -1,33 +1,26 @@
 const socket = io();
 
-// --- КОНФИГУРАЦИЯ ---
+// --- КОНФИГ ---
 const wardrobe = {
-    male: ['boy_style_1.png', 'boy_style_2.png'], // Твои файлы
-    female: ['girl_style_1.png', 'girl_style_2.png']
+    male: ['boy_style_1.png', 'boy_style_2.png', 'boy_style_3.png', 'boy_style_4.png', 'boy_style_5.png', 'suit1.png'],
+    female: ['girl_style_1.png', 'girl_style_2.png', 'girl_style_3.png', 'girl_style_4.png', 'girl_style_5.png', 'girl_style_6.png']
 };
 
-// --- СОСТОЯНИЕ ИГРОКА ---
 let myState = {
     name: "Anon",
     gender: "male",
     lookIndex: 0,
-    money: 50,
-    x: 50,         // 0..100%
+    money: 100, // Начальный капитал
+    x: 50,
     isSitting: false,
     direction: 'right'
 };
 
-// ==========================
-// 1. НАСТРОЙКА ПЕРСОНАЖА
-// ==========================
-
+// --- НАСТРОЙКИ ВНЕШНОСТИ ---
 function updatePreview() {
     const arr = wardrobe[myState.gender];
-    // Защита от выхода за пределы массива
     if (myState.lookIndex >= arr.length) myState.lookIndex = 0;
-    
-    const fileName = arr[myState.lookIndex];
-    document.getElementById('preview-img').src = 'assets/' + fileName;
+    document.getElementById('preview-img').src = 'assets/' + arr[myState.lookIndex];
 }
 
 function toggleGender() {
@@ -41,18 +34,15 @@ function nextStyle() {
     updatePreview();
 }
 
-// Запуск превью при загрузке
-updatePreview();
+updatePreview(); // старт
 
 function startGame() {
     const name = document.getElementById('username-input').value;
-    if (!name.trim()) return alert("Напиши имя!");
+    if (!name.trim()) return alert("Имя введи!");
 
     myState.name = name.trim();
-    // Формируем финальное имя файла картинки
     const finalLook = wardrobe[myState.gender][myState.lookIndex];
 
-    // Отправляем на сервер
     socket.emit('join_game', {
         name: myState.name,
         gender: myState.gender,
@@ -61,67 +51,53 @@ function startGame() {
 
     document.getElementById('login-screen').classList.add('hidden');
     document.getElementById('game-screen').classList.remove('hidden');
+    
+    // Показываем баланс сразу
+    document.getElementById('money-display').innerText = myState.money;
 
-    // Начинаем отправлять координаты
     setInterval(sendState, 100);
 }
 
-// ==========================
-// 2. ДВИЖЕНИЕ И УПРАВЛЕНИЕ
-// ==========================
-
+// --- ДВИЖЕНИЕ ---
 let moveInterval = null;
 
 function startMove(dir) {
-    if (myState.isSitting) return; // Сидя не ходим
+    if (myState.isSitting) return;
     myState.direction = dir;
-    
     if (moveInterval) clearInterval(moveInterval);
     moveInterval = setInterval(() => {
         if (dir === 'left' && myState.x > 5) myState.x -= 1;
         if (dir === 'right' && myState.x < 95) myState.x += 1;
-        // Локальное обновление (чтобы было плавно у себя)
-        // updateLocalVisuals(); // Можно добавить, но socket обновит всех
     }, 20);
 }
 
-function stopMove() {
-    clearInterval(moveInterval);
-}
+function stopMove() { clearInterval(moveInterval); }
 
 function toggleSit() {
-    // Стол находится примерно в центре (30% - 70%)
     const nearTable = myState.x > 30 && myState.x < 70;
-
     if (myState.isSitting) {
-        // Встаем
         myState.isSitting = false;
         document.getElementById('sit-btn').innerText = "🪑 Сесть";
     } else {
-        // Садимся
         if (nearTable) {
             myState.isSitting = true;
-            // Садимся красиво к столу
-            if (myState.x < 50) { myState.x = 38; myState.direction = 'right'; }
-            else { myState.x = 62; myState.direction = 'left'; }
-            
+            if (myState.x < 50) { myState.x = 35; myState.direction = 'right'; }
+            else { myState.x = 65; myState.direction = 'left'; }
             document.getElementById('sit-btn').innerText = "🏃 Встать";
         } else {
-            alert("Подойди ближе к столу!");
+            alert("Подойди к столу!");
         }
     }
-    sendState(); // Мгновенно обновить статус
+    sendState();
 }
 
 function sendState() {
     socket.emit('state_update', {
-        x: myState.x,
-        isSitting: myState.isSitting,
-        direction: myState.direction
+        x: myState.x, isSitting: myState.isSitting, direction: myState.direction
     });
 }
 
-// Управление клавиатурой (ПК)
+// Управление клавиатурой
 document.addEventListener('keydown', (e) => {
     if(myState.isSitting) return;
     if(e.key === 'ArrowLeft' || e.key === 'a') startMove('left');
@@ -129,75 +105,71 @@ document.addEventListener('keydown', (e) => {
 });
 document.addEventListener('keyup', stopMove);
 
-// ==========================
-// 3. СЕТЬ И ОТРИСОВКА
-// ==========================
-
+// --- ОТРИСОВКА ИГРОКОВ ---
 socket.on('update_players', (players) => {
-    // players - это массив всех игроков
     players.forEach(p => {
         let el = document.getElementById('player-' + p.id);
-        
-        // Если игрока нет в HTML, создаем
         if (!el) {
             el = document.createElement('div');
             el.id = 'player-' + p.id;
             el.className = 'player-char';
-            el.innerHTML = `
-                <div class="nickname">${p.name}</div>
-                <img class="player-img" src="assets/${p.look}">
-            `;
+            el.innerHTML = `<div class="nickname">${p.name}</div><img class="player-img" src="assets/${p.look}">`;
             document.getElementById('game-world').appendChild(el);
         }
-
-        // Обновляем позицию и классы
         el.style.left = p.x + '%';
-
-        // Сидит?
+        
         if (p.isSitting) el.classList.add('sitting');
         else el.classList.remove('sitting');
 
-        // Поворот
         if (p.direction === 'left') el.classList.add('flip');
         else el.classList.remove('flip');
     });
-
-    // (Дополнительно можно добавить удаление вышедших игроков)
 });
 
-// ==========================
-// 4. МЕНЮ, ЕДА, РАБОТА
-// ==========================
-
+// --- МЕНЮ И ЗАКАЗ ---
 function toggleMenu() {
-    const el = document.getElementById('food-menu');
-    el.classList.toggle('hidden');
+    document.getElementById('food-menu').classList.toggle('hidden');
 }
 
 function orderFood(name, price, imgFile) {
-    if (myState.money < price) return alert("Не хватает денег! Поработай немного.");
+    // 1. ЕСЛИ Я ПАРЕНЬ - Проверяем деньги
+    if (myState.gender === 'male') {
+        if (myState.money < price) return alert("Брат, денег нет! Иди работай.");
+    }
+    // 2. ЕСЛИ Я ДЕВУШКА - Заказываем без проверки (платит парень)
     
-    myState.money -= price;
-    document.getElementById('money-display').innerText = myState.money;
-    toggleMenu(); // Закрыть меню
+    // Закрываем меню
+    toggleMenu(); 
 
-    // Отправляем заказ
-    socket.emit('order_food', { items: [{ img: imgFile }] });
+    // Отправляем заказ на сервер (БЕЗ списания денег локально пока что)
+    socket.emit('order_food', { items: [{ img: imgFile }], price: price });
 }
 
-// Приход официанта
+// ОБРАБОТКА ЗАКАЗА (СЕРВЕР ПРИСЛАЛ ОФИЦИАНТА)
 socket.on('waiter_service', (data) => {
+    // data = { targetId, items, price }
+
+    // Анимация официанта
     const w = document.getElementById('waiter');
-    w.classList.add('active'); // Выезд
+    w.classList.add('active');
+
+    // СПИСАНИЕ ДЕНЕГ (Только у мужчин)
+    if (myState.gender === 'male') {
+        // Списываем, даже если это заказала девушка!
+        // "Рыцарский долг"
+        myState.money -= data.price;
+        if (myState.money < 0) myState.money = 0; // В минус не уходим визуально
+        document.getElementById('money-display').innerText = myState.money;
+        
+        // Можно добавить уведомление
+        if (data.price > 0) {
+            spawnFloatingText(`-${data.price}$`, 'red');
+        }
+    }
 
     setTimeout(() => {
-        // Спавн еды
         data.items.forEach(item => spawnFood(item.img));
-        
-        // Уход официанта
-        setTimeout(() => {
-            w.classList.remove('active');
-        }, 2000);
+        setTimeout(() => { w.classList.remove('active'); }, 2000);
     }, 1500);
 });
 
@@ -205,39 +177,49 @@ function spawnFood(imgSrc) {
     const img = document.createElement('img');
     img.src = 'assets/' + imgSrc;
     img.className = 'food-item';
-    // Клик по еде -> Кусь
     img.onclick = function() {
         this.style.animation = "eatAnim 1s forwards";
-        setTimeout(() => this.remove(), 1000); // Удалить после анимации
+        setTimeout(() => this.remove(), 1000);
     };
     document.getElementById('table-area').appendChild(img);
 }
 
-// Счет
+function spawnFloatingText(text, color) {
+    // Простая всплывашка при трате денег
+    const el = document.createElement('div');
+    el.innerText = text;
+    el.style.position = 'absolute';
+    el.style.top = '10%';
+    el.style.left = '50%';
+    el.style.color = color;
+    el.style.fontSize = '24px';
+    el.style.fontWeight = 'bold';
+    el.style.transition = 'top 1s, opacity 1s';
+    el.style.zIndex = 100;
+    document.body.appendChild(el);
+    setTimeout(() => { el.style.top = '5%'; el.style.opacity = 0; }, 50);
+    setTimeout(() => el.remove(), 1000);
+}
+
+// --- СЧЕТ ---
 function askBill() {
     if (myState.gender === 'male') {
-        alert(`Официант: "С вас ${200 - myState.money}$. Оплата картой или натурой?"`);
+        alert(`Официант косится на вас...\nВаш остаток: ${myState.money}$`);
     } else {
-        alert("Официант принес счет мужчине... Как и положено.");
+        alert("Вы красиво улыбаетесь. Платить будет он.");
     }
 }
 
-// ==========================
-// 5. МИНИ-ИГРА (РАБОТА)
-// ==========================
+// --- РАБОТА ---
 let workInterval = null;
-
 function toggleWork() {
     const overlay = document.getElementById('work-overlay');
     if (overlay.classList.contains('hidden')) {
-        // Начало работы
         overlay.classList.remove('hidden');
         workInterval = setInterval(spawnHeart, 700);
     } else {
-        // Конец работы
         overlay.classList.add('hidden');
         clearInterval(workInterval);
-        // Удалить оставшиеся сердечки
         document.querySelectorAll('.heart-item').forEach(h => h.remove());
     }
 }
@@ -247,28 +229,22 @@ function spawnHeart() {
     h.innerText = "💖";
     h.className = "heart-item";
     h.style.left = Math.random() * 90 + "%";
-    
     h.onmousedown = function() {
         myState.money += 10;
         document.getElementById('money-display').innerText = myState.money;
         this.remove();
     };
-    
     document.getElementById('work-overlay').appendChild(h);
 }
 
-// ==========================
-// 6. ЧАТ
-// ==========================
+// --- ЧАТ ---
 function sendMessage() {
     const inp = document.getElementById('chat-input');
-    const txt = inp.value.trim();
-    if (txt) {
-        socket.emit('chat_message', txt);
+    if (inp.value.trim()) {
+        socket.emit('chat_message', inp.value.trim());
         inp.value = '';
     }
 }
-
 socket.on('chat_message', (data) => {
     const div = document.getElementById('chat-messages');
     div.innerHTML += `<div><b>${data.user}:</b> ${data.text}</div>`;
