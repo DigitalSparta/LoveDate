@@ -2,8 +2,14 @@
 body { margin: 0; overflow: hidden; font-family: 'Segoe UI', sans-serif; background: #222; touch-action: none; user-select: none; }
 .hidden { display: none !important; }
 
+/* ПРЕЛОАДЕР */
+#preloader { position: fixed; top:0; left:0; width:100%; height:100%; background: #ffdde1; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s; }
+.loader-heart { font-size: 80px; animation: heartbeat 1s infinite; }
+.loader-text { font-size: 20px; color: #ff6b6b; font-weight: bold; margin-top: 20px; }
+@keyframes heartbeat { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
+
 /* ЭКРАНЫ */
-.screen { position: absolute; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.screen { position: absolute; top:0; left:0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
 
 /* ЛОГИН */
 #login-screen { background: linear-gradient(135deg, #ff9a9e, #fecfef); z-index: 20; }
@@ -19,15 +25,15 @@ body { margin: 0; overflow: hidden; font-family: 'Segoe UI', sans-serif; backgro
 .btn-small { padding: 8px 12px; font-size: 12px; background: white; color: #333; border: 1px solid #ccc; box-shadow: 0 2px #aaa; }
 .work-btn { background: #4CAF50; color: white; border: none; }
 
-/* МИР */
+/* ИГРОВОЙ МИР */
 #game-world { position: absolute; top:0; left:0; width: 100%; height: 100%; background: url('assets/bg.png') center bottom / cover no-repeat; z-index: 1; overflow: hidden; }
 
-/* ИГРОКИ (Адаптивные размеры) */
+/* ИГРОКИ */
 .player-char { 
     position: absolute; 
-    bottom: 12%; /* Подняли чуть выше */
-    width: 15vh; /* Размер зависит от высоты экрана, чтобы на телефонах было норм */
-    height: 25vh; 
+    bottom: 15%; 
+    width: 130px; 
+    height: 190px; 
     transition: left 0.1s linear, bottom 0.3s; 
     pointer-events: none; 
     display: flex; flex-direction: column; align-items: center; 
@@ -35,49 +41,59 @@ body { margin: 0; overflow: hidden; font-family: 'Segoe UI', sans-serif; backgro
 .player-img { width: 100%; height: 100%; object-fit: contain; }
 .nickname { background: rgba(255,255,255,0.8); padding: 2px 6px; border-radius: 6px; font-size: 10px; font-weight: bold; margin-bottom: 2px; white-space: nowrap; }
 
-/* Состояния */
-.sitting { bottom: 20% !important; transform: scale(0.85); }
+/* ПРАВИЛЬНАЯ ПОСАДКА */
+/* Уменьшаем масштаб, чтобы казалось, что он за столом, и поднимаем bottom, чтобы сел на стул */
+.sitting { bottom: 25% !important; transform: scale(0.85); z-index: 2; }
 .flip { transform: scaleX(-1); }
 .flip .nickname { transform: scaleX(-1); }
 .sitting.flip { transform: scale(0.85) scaleX(-1); }
 
-/* ОФИЦИАНТ */
+/* ОФИЦИАНТ (Уменьшен) */
 #waiter { 
     position: absolute; 
     right: -50%; 
-    bottom: 15%; 
-    width: 18vh; /* Тоже адаптивный */
+    bottom: 20%; /* Чуть выше, чтобы не перекрывал кнопки */
+    width: 120px; /* Фиксированный адекватный размер */
     transition: right 1s ease-in-out; 
-    z-index: 5; 
+    z-index: 3; 
 }
-#waiter.active { right: 5%; }
+#waiter img { width: 100%; }
+#waiter.active { right: 2%; }
 .bubble { position: absolute; top: -30px; left: 0; background: white; padding: 5px; border-radius: 10px; border: 2px solid gold; font-size: 10px; width: 100%; text-align: center; }
 
-/* СТОЛ И ЕДА */
-#table-area { 
-    position: absolute; 
-    bottom: 22%; /* Подняли, чтобы попадало на стол на картинке */
-    left: 50%; 
-    transform: translateX(-50%); 
-    width: 60%; /* Ширина от экрана */
-    max-width: 300px;
-    height: 60px; 
-    z-index: 4; 
-    display: flex; 
-    justify-content: center; 
-    align-items: flex-end; 
+/* ТАРЕЛКИ (ЗОНЫ ЕДЫ) */
+.plate-zone {
+    position: absolute;
+    bottom: 28%; /* Высота стола на картинке */
+    width: 80px;
+    height: 60px;
+    z-index: 4;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
 }
-.food-item { width: 50px; height: 50px; cursor: pointer; animation: popIn 0.5s; margin: 0 2px; pointer-events: auto; object-fit: contain; }
-@keyframes popIn { 0% { transform: scale(0); } 100% { transform: scale(1); } }
-@keyframes eatAnim { 0% { transform: scale(1); } 50% { transform: scale(1.2) rotate(15deg); } 100% { transform: scale(0); opacity: 0; } }
+/* Позиции тарелок подходят под bg.png */
+#plate-left { left: 28%; }  
+#plate-right { right: 28%; }
+
+.food-item { width: 100%; height: 100%; cursor: pointer; animation: popIn 0.5s; object-fit: contain; pointer-events: auto; }
+@keyframes popIn { 0% { transform: scale(0) translateY(-20px); } 100% { transform: scale(1) translateY(0); } }
+@keyframes eatAnim { 0% { transform: scale(1); } 100% { transform: scale(0); opacity: 0; } }
 
 /* ИНТЕРФЕЙС */
 #ui-layer { position: absolute; top:0; left:0; width:100%; height:100%; z-index: 10; pointer-events: none; }
 #top-bar { position: absolute; top:0; width:100%; padding: 10px; background: rgba(255,255,255,0.9); display: flex; justify-content: space-between; align-items: center; pointer-events: auto; box-sizing: border-box; }
-.stat { font-weight: bold; font-size: 14px; }
 
-#chat-container { position: absolute; bottom: 90px; left: 10px; width: 60%; pointer-events: auto; }
-#chat-messages { height: 100px; overflow-y: auto; background: rgba(0,0,0,0.5); border-radius: 10px; padding: 5px; color: white; font-size: 12px; margin-bottom: 5px; }
+/* ЧАТ (Уменьшен и сдвинут) */
+#chat-container { 
+    position: absolute; 
+    bottom: 90px; 
+    left: 10px; 
+    width: 250px; 
+    pointer-events: auto; 
+    opacity: 0.9;
+}
+#chat-messages { height: 80px; /* Меньше высота */ overflow-y: auto; background: rgba(0,0,0,0.6); border-radius: 10px; padding: 5px; color: white; font-size: 11px; margin-bottom: 5px; }
 #chat-input-row { display: flex; gap: 5px; }
 #chat-input { flex: 1; padding: 5px; border-radius: 5px; border: none; font-size: 12px; }
 
@@ -96,16 +112,22 @@ body { margin: 0; overflow: hidden; font-family: 'Segoe UI', sans-serif; backgro
 @keyframes fall { from { top: -50px; } to { top: 110%; } }
 .close-overlay-btn { position: absolute; top: 20px; right: 20px; }
 
-/* --- МОБИЛЬНАЯ АДАПТАЦИЯ (САМОЕ ВАЖНОЕ) --- */
+/* --- МОБИЛЬНАЯ АДАПТАЦИЯ --- */
 @media (max-width: 600px) {
-    .player-char { width: 18vh; height: 28vh; bottom: 15%; } /* Персонажи чуть крупнее на мелком экране */
-    .sitting { bottom: 22% !important; }
+    /* Официант еще меньше на телефоне */
+    #waiter { width: 80px; bottom: 22%; }
     
-    #waiter { width: 20vh; right: -60%; } /* Официант не такой огромный */
-    #waiter.active { right: 0; } /* Выезжает только до края */
+    /* Тарелки чуть ближе к центру на узких экранах */
+    #plate-left { left: 20%; }
+    #plate-right { right: 20%; }
     
-    #table-area { bottom: 25%; width: 80%; } /* Стол шире */
+    /* Игроки */
+    .player-char { width: 100px; height: 150px; bottom: 16%; }
+    .sitting { bottom: 24% !important; }
+
+    /* Чат не такой широкий */
+    #chat-container { width: 180px; bottom: 85px; }
     
-    .btn-small { padding: 5px; font-size: 10px; } /* Мелкие кнопки меню */
-    #chat-container { width: 50%; bottom: 85px; } /* Чат поменьше */
+    /* Кнопки управления */
+    .arrow-btn { width: 45px; height: 45px; }
 }
