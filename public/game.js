@@ -11,7 +11,7 @@ window.onload = function() {
 };
 
 const wardrobe = {
-    male: ['boy_style_1.png', 'boy_style_2.png', 'boy_style_3.png', 'boy_style_4.png', 'boy_style_5.png', 'suit1.png'],
+    male: ['boy_style_1.png', 'boy_style_2.png', 'boy_style_3.png', 'boy_style_4.png', 'boy_style_5.png'],
     female: ['girl_style_1.png', 'girl_style_2.png', 'girl_style_3.png', 'girl_style_4.png', 'girl_style_5.png', 'girl_style_6.png']
 };
 
